@@ -53,6 +53,18 @@ def run(model: str) -> dict:
     }
 
 
+def table(results: dict) -> str:
+    rows = ["| Model | Time for 205 senders | Named people right | Sent to you to check "
+            "| Wrong and confident | Overall |",
+            "|---|---|---|---|---|---|"]
+    for r in results.values():
+        mins, secs = divmod(int(r["seconds"]), 60)
+        rows.append(f"| `{r['model']}` | {mins} min {secs:02d} s | {r['named_right']}/{r['named_total']} "
+                    f"| {r['sent_to_human']} | {len(r['wrong_and_confident'])} "
+                    f"| {r['accuracy'] * 100:.1f} % |")
+    return "\n".join(rows)
+
+
 if __name__ == "__main__":
     out_path = ROOT / "docs" / "bench.json"
     results = json.loads(out_path.read_text(encoding="utf-8")) if out_path.exists() else {}
@@ -60,3 +72,8 @@ if __name__ == "__main__":
         results[model] = run(model)
         print(json.dumps(results[model], ensure_ascii=False, indent=1), flush=True)
         out_path.write_text(json.dumps(results, ensure_ascii=False, indent=1), encoding="utf-8")
+        (ROOT / "docs" / "bench.md").write_text(
+            "# Judge on the synthetic statement\n\n"
+            "205 senders over July–September 2026: 200 customers and 5 people named in the "
+            "owner's notes. Ollama on an RTX 5050 laptop (8 GB VRAM), temperature 0, "
+            "thinking off, 12 senders per call.\n\n" + table(results) + "\n", encoding="utf-8")

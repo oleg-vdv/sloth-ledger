@@ -165,3 +165,13 @@ def test_one_transfer_is_not_called_a_repeating_amount():
     one = senders.Sender("А Б.", [22000.0], ["2026-07-01"]).summary()
     two = senders.Sender("А Б.", [22000.0, 22000.0], ["2026-07-01", "2026-08-01"]).summary()
     assert "same_amount_every_time" not in one and two["same_amount_every_time"] is True
+
+
+def test_not_income_without_a_note_goes_to_the_human():
+    """The model may call a stranger 'family'; that claim needs the owner's word."""
+    j = judge.Judge(transport=fake([
+        {"name": "Ерлан Б.", "category": "family", "confidence": "high", "reason": "brother"},
+        {"name": "Ерлан С.", "category": "family", "confidence": "high", "reason": "brother"}]))
+    verdicts = j.classify("Брат Ерлан С. иногда скидывает деньги.", people("Ерлан Б.", "Ерлан С."))
+    assert verdicts["Ерлан Б."].needs_human
+    assert not verdicts["Ерлан С."].needs_human

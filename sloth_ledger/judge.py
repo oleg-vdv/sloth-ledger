@@ -21,7 +21,7 @@ import urllib.request
 from dataclasses import dataclass
 from typing import Any, Callable
 
-from .senders import Sender, mentioned
+from .senders import Sender, key, mentioned
 
 CATEGORIES = {
     "customer": "pays for goods or services you sell — business income",
@@ -30,6 +30,8 @@ CATEGORIES = {
     "loan": "lending you money or repaying a personal loan",
     "unclear": "you cannot tell from the profile and the owner's notes",
 }
+
+PERSONAL = {"family", "shared", "loan"}   # categories that say "this is not income"
 
 DEFAULT_HOST = os.environ.get("OLLAMA_HOST_URL", "http://127.0.0.1:11434")
 DEFAULT_MODEL = os.environ.get("SLOTH_MODEL", "gemma4:12b")
@@ -132,6 +134,7 @@ class Judge:
     def classify(self, notes: str, senders: list[Sender],
                  progress: Callable[[int, int], None] | None = None) -> dict[str, Verdict]:
         out: dict[str, Verdict] = {}
+        named = mentioned(notes)
         for start in range(0, len(senders), BATCH):
             batch = senders[start:start + BATCH]
             wanted = {s.name for s in batch}
@@ -143,6 +146,10 @@ class Judge:
                 if category not in CATEGORIES:
                     category = "unclear"
                 confidence = "high" if row.get("confidence") == "high" else "low"
+                if category in PERSONAL and key(name) not in named:
+                    # "not income" is the claim that matters to the tax office;
+                    # without the owner's word for it, it's a guess for a human
+                    confidence = "low"
                 out[name] = Verdict(name, category, confidence,
                                     str(row.get("reason", "")).strip()[:200])
             for sender in batch:      # silence is not an answer
