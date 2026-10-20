@@ -110,8 +110,9 @@ def assemble(s: dict, out: Path) -> None:
     frames = []
     frames += hold(s["landing"], 3, "A notice came because of card transfers. Here's the statement.")
     frames += hold(s["sample"], 3.5, "Three sentences about who sends you money + the statement")
-    for _, img in s["run"]:
-        frames += hold(img, 0.35, run_text)
+    run = s["run"][::max(1, len(s["run"]) // 36)]   # about ten seconds of waiting
+    for _, img in run:
+        frames += hold(img, 0.28, run_text)
     frames += pan(s["results"], s["meter_top"], s["meter_top"], 3,
                   "Rule computed by code: 100+ senders, 3 months, > 12 minimum wages")
     frames += pan(s["results"], s["meter_top"], s["results_top"], 1.5)

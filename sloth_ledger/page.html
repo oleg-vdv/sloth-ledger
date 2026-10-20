@@ -101,7 +101,7 @@ section.block { margin-top: 44px; }
 .people { width: 100%; border-collapse: collapse; font-size: 15px; font-variant-numeric: tabular-nums; }
 .people th { text-align: left; font-weight: 600; color: var(--muted); border-bottom: 2px solid var(--ink); padding: 8px 10px 8px 0; }
 .people td { border-bottom: 1px solid var(--rule-soft); padding: 7px 10px 7px 0; vertical-align: top; }
-.people td.r, .people th.r { text-align: right; }
+.people td.r, .people th.r { text-align: right; white-space: nowrap; }
 .people tr.flag td { background: #F6E9E7; }
 .people select { background: var(--sheet); border: 1px solid var(--rule); border-radius: 3px; padding: 3px 6px; }
 .people .why { color: var(--muted); font-size: 14px; }
@@ -214,7 +214,7 @@ section.block { margin-top: 44px; }
 
 <script>
 const LABEL = {customer: "клиенты, оплата за товары и услуги", family: "родственники",
-  shared: "общие расходы (аренда, коммуналка)", loan: "займы и их возврат", unclear: "непонятно"};
+  shared: "общие расходы (аренда, коммуналка)", loan: "займы и их возврат", unclear: "ждут вашей проверки"};
 const SHORT = {customer: "клиент", family: "родственник", shared: "общие расходы", loan: "заём", unclear: "непонятно"};
 const $ = id => document.getElementById(id);
 const money = v => Math.round(v).toLocaleString("ru-RU").replace(/,/g, " ") + " ₸";
@@ -291,7 +291,9 @@ function showResults(s) {
 }
 function drawTotals() {
   const t = {};
-  senders.forEach(p => { (t[p.category] ||= [0, 0]); t[p.category][0]++; t[p.category][1] += p.total_kzt; });
+  // same rule as the letter: an unconfirmed guess counts as "непонятно"
+  const settled = p => p.category === "unclear" || p.confidence === "low" ? "unclear" : p.category;
+  senders.forEach(p => { const c = settled(p); (t[c] ||= [0, 0]); t[c][0]++; t[c][1] += p.total_kzt; });
   $("totals").innerHTML = Object.keys(LABEL).filter(k => t[k]).map(k =>
     `<tr><td>${LABEL[k]}, ${t[k][0]} чел.</td><td>${money(t[k][1])}</td></tr>`).join("");
   const flagged = senders.filter(p => p.category === "unclear" || p.confidence === "low");

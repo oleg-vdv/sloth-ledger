@@ -26,6 +26,12 @@ LABELS = {
 }
 
 
+def settled(verdict: Verdict) -> str:
+    """The category the letter may state. A guess the human hasn't confirmed
+    is "unclear" here, whatever the model said — guesses don't reach the letter."""
+    return "unclear" if verdict.needs_human else verdict.category
+
+
 def money(value: float) -> str:
     return f"{round(value):,}".replace(",", " ") + " ₸"
 
@@ -33,7 +39,7 @@ def money(value: float) -> str:
 def totals(senders: list[Sender], verdicts: dict[str, Verdict]) -> dict[str, tuple[int, float]]:
     out: dict[str, list[float]] = defaultdict(lambda: [0, 0.0])
     for sender in senders:
-        row = out[verdicts[sender.name].category]
+        row = out[settled(verdicts[sender.name])]
         row[0] += 1
         row[1] += sender.total
     return {k: (int(v[0]), v[1]) for k, v in out.items()}
@@ -44,7 +50,7 @@ def draft(window: Window, senders: list[Sender], verdicts: dict[str, Verdict],
     sums = totals(senders, verdicts)
     named = defaultdict(list)
     for sender in senders:
-        category = verdicts[sender.name].category
+        category = settled(verdicts[sender.name])
         if category in ("family", "shared", "loan"):
             named[category].append(f"{sender.name} — {money(sender.total)}")
 

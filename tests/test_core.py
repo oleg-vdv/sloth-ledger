@@ -175,3 +175,18 @@ def test_not_income_without_a_note_goes_to_the_human():
     verdicts = j.classify("Брат Ерлан С. иногда скидывает деньги.", people("Ерлан Б.", "Ерлан С."))
     assert verdicts["Ерлан Б."].needs_human
     assert not verdicts["Ерлан С."].needs_human
+
+
+def test_a_guess_never_reaches_the_letter():
+    """Low confidence 'shared' must not be written as rent until a human confirms it."""
+    ops, truth = synth.generate()
+    parsed = statement.parse_text(synth.as_text(ops))
+    group = senders.group(parsed)
+    verdicts = {s.name: judge.Verdict(s.name, truth[s.name], "high", "") for s in group}
+    guessed = next(s.name for s in group if truth[s.name] == "customer")
+    verdicts[guessed] = judge.Verdict(guessed, "shared", "low", "guess")
+    text = letter.draft(rule.worst(parsed), group, verdicts)
+    assert guessed not in text
+    assert "(их 1)" in text
+    verdicts[guessed] = judge.Verdict(guessed, "shared", "high", "изменено вручную")
+    assert guessed in letter.draft(rule.worst(parsed), group, verdicts)
