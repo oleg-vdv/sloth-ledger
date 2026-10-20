@@ -12,6 +12,11 @@ Explaining it means going through hundreds of transfers by hand and sorting
 them into "customer", "mum", "flatmate paying her half of the rent". Nobody
 wants to do that. This does it for you, on your own machine.
 
+![demo](docs/demo.gif)
+
+([video](docs/demo.mp4) — a real run against `gemma4:12b` on a laptop GPU,
+the 16-minute model run compressed and labelled.)
+
 You give it:
 
 - the card statement (Kaspi Gold PDF, plain text or CSV), and

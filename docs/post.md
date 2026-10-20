@@ -27,7 +27,9 @@ The lazy part is the point: you don't open 413 incoming transfers. You read a li
 
 ## Demo
 
-{{VIDEO}}
+![sloth-ledger demo: the 100/3/12 check, a 17-minute local Gemma run compressed, the short list to check, the draft letter](https://raw.githubusercontent.com/oleg-vdv/sloth-ledger/main/docs/demo.gif)
+
+Full-resolution video: [docs/demo.mp4](https://github.com/oleg-vdv/sloth-ledger/blob/main/docs/demo.mp4). Every frame is a real screenshot of a real run against `gemma4:12b` on my laptop; the 16½-minute model run is compressed and labelled as such.
 
 The demo uses a synthetic statement: a home baker, July–September 2026, 537 operations, 205 people who sent her money. No real statement was used anywhere in this project.
 
