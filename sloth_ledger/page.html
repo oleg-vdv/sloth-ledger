@@ -84,6 +84,7 @@ textarea { min-height: 168px; resize: vertical;
 }
 .stamp.on { opacity: .88; transform: rotate(-9deg) scale(1); }
 .stamp small { display: block; font-weight: 500; font-size: 12px; letter-spacing: 0; }
+.legend { display: none; margin-top: 10px; font-size: 14px; color: var(--stamp); }
 
 .progress { margin: 18px 0 0; color: var(--muted); font-variant-numeric: tabular-nums; }
 .progress .track { height: 4px; background: var(--rule-soft); margin-top: 6px; }
@@ -123,7 +124,10 @@ section.block { margin-top: 44px; }
   .cols { gap: 10px; }
   .col .bar { height: 120px; }
   .col .num { font-size: 24px; }
-  .stamp { right: 10px; top: 10px; font-size: 14px; }
+  .stamp { position: static; display: inline-block; margin: 10px 0 0 4px; font-size: 14px; transform: rotate(-4deg) scale(1.4); }
+  .stamp.on { transform: rotate(-4deg) scale(1); }
+  .col .line span { display: none; }
+  .legend { display: block; }
   .letter { padding: 24px 18px; }
   .people .why { display: none; }
 }
@@ -172,9 +176,10 @@ section.block { margin-top: 44px; }
     <div class="meter-head">
       <h2>Правило 100/3/12 за <span id="period"></span></h2>
     </div>
-    <div class="cols" id="cols"></div>
-    <div class="sum" id="sum"></div>
     <div class="stamp" id="stamp" aria-hidden="true">ПОД КРИТЕРИЙ<small>банк передаёт сведения в КГД</small></div>
+    <div class="cols" id="cols"></div>
+    <div class="legend">Пунктир — 100 отправителей, красное — сколько сверх.</div>
+    <div class="sum" id="sum"></div>
     <div class="progress" id="progress"><span id="progressText"></span><div class="track"><i id="bar"></i></div></div>
     <p class="error" id="error" hidden></p>
   </div>

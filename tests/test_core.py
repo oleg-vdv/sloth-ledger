@@ -129,6 +129,9 @@ def test_letter_numbers_come_from_the_statement():
     assert "изготовлением тортов на заказ" in text
     assert "требует уточнения" not in text
     assert "За период с 01.07.2026 по 30.09.2026" in text
+    assert "(отправителей: 200)" in text
+    inner = text.split("[")[1:]
+    assert all("]" in part and "[" not in part.split("]")[0] for part in inner), "no nested placeholders"
 
 
 def test_letter_warns_when_someone_is_unclear():
@@ -137,4 +140,4 @@ def test_letter_warns_when_someone_is_unclear():
     group = senders.group(parsed)
     verdicts = {s.name: judge.Verdict(s.name, "unclear", "low", "") for s in group}
     text = letter.draft(rule.worst(parsed), group, verdicts)
-    assert f"уточните {len(group)} отправителей" in text
+    assert f"(их {len(group)})" in text

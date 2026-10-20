@@ -62,7 +62,7 @@ def draft(window: Window, senders: list[Sender], verdicts: dict[str, Verdict],
     for category in ("customer", "family", "shared", "loan", "unclear"):
         if category in sums:
             count, total = sums[category]
-            lines.append(f"— {LABELS[category]}: {money(total)} от {count} отправителей;")
+            lines.append(f"— {LABELS[category]}: {money(total)} (отправителей: {count});")
     lines.append("")
     if named["family"]:
         lines.append("Переводы от родственников: " + "; ".join(named["family"]) + ".")
@@ -76,11 +76,11 @@ def draft(window: Window, senders: list[Sender], verdicts: dict[str, Verdict],
         lines += ["",
                   f"Поступления на сумму {money(sums['customer'][1])} связаны с "
                   f"{activity}. [Выберите: «Зарегистрировался(-ась) в качестве ИП "
-                  "[дата] и задекларирую доход в установленном порядке» / иное "
-                  "пояснение.]"]
+                  "и задекларирую этот доход в установленном порядке» или дайте "
+                  "своё пояснение.]"]
     if "unclear" in sums:
-        lines += ["", f"[Перед отправкой уточните {sums['unclear'][0]} отправителей "
-                      "с пометкой «требует уточнения» — в письме их быть не должно.]"]
+        lines += ["", f"[Перед отправкой разберите отправителей с пометкой «требует "
+                      f"уточнения» (их {sums['unclear'][0]}) — в письме их быть не должно.]"]
     lines += ["", "Приложение: выписка по счёту за указанный период.", "",
               "[Дата]                                   [Подпись]"]
     return "\n".join(lines)
