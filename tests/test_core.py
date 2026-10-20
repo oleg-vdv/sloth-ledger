@@ -141,3 +141,27 @@ def test_letter_warns_when_someone_is_unclear():
     verdicts = {s.name: judge.Verdict(s.name, "unclear", "low", "") for s in group}
     text = letter.draft(rule.worst(parsed), group, verdicts)
     assert f"(их {len(group)})" in text
+
+
+# --- notes matching -----------------------------------------------------------
+
+def test_notes_match_exact_person_through_case_endings():
+    named = senders.mentioned("Снимаю с Динарой К. Одолжила у подруги Жанны Т.")
+    assert senders.key("Динара К.") in named and senders.key("Жанна Т.") in named
+
+
+def test_same_first_name_other_initial_is_not_named():
+    named = senders.mentioned("Брат Ерлан С. Соседка Динара К.")
+    assert senders.key("Ерлан Б.") not in named and senders.key("Динара Ш.") not in named
+
+
+def test_profile_tells_the_model_who_is_named():
+    named = senders.mentioned("Мама — Гульнара С.")
+    assert senders.Sender("Гульнара С.", [1.0], ["2026-07-01"]).summary(named)["named_in_notes"]
+    assert not senders.Sender("Гульнара Е.", [1.0], ["2026-07-01"]).summary(named)["named_in_notes"]
+
+
+def test_one_transfer_is_not_called_a_repeating_amount():
+    one = senders.Sender("А Б.", [22000.0], ["2026-07-01"]).summary()
+    two = senders.Sender("А Б.", [22000.0, 22000.0], ["2026-07-01", "2026-08-01"]).summary()
+    assert "same_amount_every_time" not in one and two["same_amount_every_time"] is True

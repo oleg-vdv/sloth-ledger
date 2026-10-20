@@ -21,7 +21,7 @@ import urllib.request
 from dataclasses import dataclass
 from typing import Any, Callable
 
-from .senders import Sender
+from .senders import Sender, mentioned
 
 CATEGORIES = {
     "customer": "pays for goods or services you sell — business income",
@@ -40,7 +40,9 @@ to the tax office. For each sender profile decide which category fits:
 {categories}
 
 Rules:
-- Use the owner's notes first. A name in the notes decides the category.
+- named_in_notes says whether the owner wrote about this exact person. If it \
+is true, the note decides the category. If it is false, the notes are not \
+about this sender, even when the first name looks the same.
 - Without a note, judge by the pattern: many people paying varied amounts \
 once or twice look like customers; the same amount on the same days every \
 month from a few people looks like shared rent or bills.
@@ -103,9 +105,10 @@ class Judge:
 
     def _ask(self, notes: str, batch: list[Sender]) -> list[dict[str, Any]]:
         categories = "\n".join(f"- {k}: {v}" for k, v in CATEGORIES.items())
+        named = mentioned(notes)
         user = ("Owner's notes:\n" + (notes.strip() or "(none)") +
                 "\n\nSender profiles:\n" +
-                json.dumps([s.summary() for s in batch], ensure_ascii=False))
+                json.dumps([s.summary(named) for s in batch], ensure_ascii=False))
         payload = {
             "model": self.model,
             "stream": False,

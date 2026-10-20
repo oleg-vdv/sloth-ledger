@@ -1,0 +1,57 @@
+{
+ "gemma4:12b": {
+  "model": "gemma4:12b",
+  "senders": 205,
+  "seconds": 983.2,
+  "accuracy": 0.898,
+  "named_right": 5,
+  "named_total": 5,
+  "sent_to_human": 5,
+  "wrong_and_confident": [
+   "Ерлан Б.",
+   "Динара Ш.",
+   "Марат Т.",
+   "Арман Н.",
+   "Меруерт У.",
+   "Зарина Н.",
+   "Динара И.",
+   "Динара Ж.",
+   "Улжан Ш.",
+   "Гульмира У.",
+   "Гульмира О.",
+   "Алтынай Г.",
+   "Ботагоз Ы.",
+   "Кайрат Б.",
+   "Бауыржан Ы.",
+   "Алтынай Ж.",
+   "Динара Т."
+  ],
+  "named": {
+   "Гульнара С.": [
+    "family",
+    "high",
+    "Owner's notes identify her as the owner's mother."
+   ],
+   "Ерлан С.": [
+    "family",
+    "high",
+    "Owner's notes identify Ерлан С. as her brother."
+   ],
+   "Динара К.": [
+    "shared",
+    "high",
+    "Owner's notes identify her as a flatmate paying share of rent and bills."
+   ],
+   "Асель М.": [
+    "shared",
+    "high",
+    "Owner's notes identify her as a flatmate paying share of rent and bills."
+   ],
+   "Жанна Т.": [
+    "loan",
+    "high",
+    "Owner's notes specify this as a repayment of a loan from July."
+   ]
+  }
+ }
+}
