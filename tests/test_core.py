@@ -190,3 +190,13 @@ def test_a_guess_never_reaches_the_letter():
     assert "(их 1)" in text
     verdicts[guessed] = judge.Verdict(guessed, "shared", "high", "изменено вручную")
     assert guessed in letter.draft(rule.worst(parsed), group, verdicts)
+
+
+# --- page --------------------------------------------------------------------
+
+def test_page_makes_no_request_outside_the_local_server():
+    from pathlib import Path
+    import re
+    page = (Path(__file__).parent.parent / "sloth_ledger" / "page.html").read_text(encoding="utf-8")
+    css = (Path(__file__).parent.parent / "sloth_ledger" / "fonts" / "fonts.css").read_text(encoding="utf-8")
+    assert not re.search(r"https?://", re.sub(r'href="https://dev\.to[^"]*"', "", page + css))

@@ -86,6 +86,14 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:
         if self.path == "/":
             self._send(200, (HERE / "page.html").read_bytes(), "text/html; charset=utf-8")
+        elif self.path.startswith("/fonts/") and "/" not in self.path[7:]:
+            # fonts ship with the package: the page makes no request outside this server
+            path = HERE / "fonts" / self.path[7:]
+            kind = "text/css; charset=utf-8" if path.suffix == ".css" else "font/woff2"
+            if path.is_file():
+                self._send(200, path.read_bytes(), kind)
+            else:
+                self._json({"error": "нет такого файла"}, 404)
         elif self.path == "/config":
             self._json({"model": CONFIG["model"]})
         elif self.path == "/sample":

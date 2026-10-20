@@ -57,7 +57,8 @@ Then the code distrusts the answer:
 - a sender the model invents is dropped;
 - a sender it skips becomes "unclear";
 - malformed JSON or an unknown category becomes "unclear";
-- "unclear" or low confidence goes to the human list.
+- "unclear" or low confidence goes to the human list;
+- **a guess never reaches the letter**: until you confirm a sender, the letter counts them as "needs checking", whatever the model said.
 
 Every failure lands on the human, never in the letter.
 
@@ -74,12 +75,14 @@ The model runs on an RTX 5050 laptop in my flat (8 GB of VRAM), served by Ollama
 
 The column I care about most is the last one, and it's zero for every model — because of the guard rails, not the models. What the model changes is how much is left for you: the 12B leaves 9 people to look at, the 2B shrugs at almost everyone. Slow and steady wins: the 12B is ten times slower than the 2B and saves you 191 lookups.
 
-It didn't start at zero. The first 12B run made **17 confident mistakes**, and both causes were in my code, not in the prompt:
+It didn't start at zero. The first 12B run made **17 confident mistakes** — all of them customers put in the wrong bucket. Looking at who they were, two causes stood out, and both were in what my code fed the model, not in the prompt:
 
-1. **Same first name.** The notes said flatmate «Динара К.»; the model gave the flatmate label to «Динара Ш.», «Динара Ж.» and «Динара Т.» too — all customers. Now the code finds every «Name I.» in the notes (Russian case endings included: «с Динарой К.» matches «Динара К.») and tells the model `named_in_notes: true/false`.
-2. **A misleading feature.** I passed `same_amount_every_time`, which is trivially true for someone who paid once. The model read one-off customers as regular rent payments. It's now only sent when there are two or more transfers.
+1. **Same first name.** Four of the seventeen were called Динара — Ш., И., Ж., Т. The only Динара in the notes is the flatmate, «Динара К.». A fifth was «Ерлан Б.»; the brother in the notes is «Ерлан С.». So the code now finds every «Name I.» in the notes itself (Russian case endings included: «с Динарой К.» matches «Динара К.») and tells the model `named_in_notes: true/false`.
+2. **A misleading feature.** I passed `same_amount_every_time`, which is trivially true for someone who paid once — and nine of the seventeen had paid exactly once. Now it's only sent when there are two or more transfers.
 
-That got it to 5. The last five were the model still calling «Ерлан Б.» the brother «Ерлан С.», and customers who happened to pay the same price twice. So one more rule, in code: **"family", "shared" or "loan" for someone the notes don't name is a guess**, and a guess about what is *not* income goes to the human. Zero.
+That took it from 17 to 5: «Ерлан Б.» still, and four customers who happened to pay the same price twice. (In the demo run the model's own reason for such senders reads «Фиксированная сумма в разные даты может быть оплатой аренды» — "a fixed amount on different dates could be rent".) So one more rule, in code: **"family", "shared" or "loan" for someone the notes don't name is a guess**, and a guess about what is *not* income goes to the human. Zero.
+
+Then recording the demo caught a bug the benchmark couldn't: those low-confidence guesses were correctly flagged for the human — and *also* written into the draft letter as rent. The benchmark scored the sorting; nobody was scoring the letter. Now an unconfirmed guess is "needs checking" in the letter too, and there's a test for it.
 
 I don't report plain accuracy: 200 of the 205 senders are customers, so a model that calls everyone a customer scores 97.6%. Full numbers and the script are in the repo (`bench.py`, `docs/bench.md`).
 
@@ -87,7 +90,7 @@ I don't report plain accuracy: 200 of the 205 senders are customers, so a model 
 
 A card statement is the most personal document most people own: full names, amounts, the rhythm of their week. Uploading it to a hosted API in order to answer a letter from the tax office would be a small privacy incident of its own — and in Kazakhstan, personal data law makes the person who uploaded it responsible for where it went.
 
-With an open-weight model the whole thing runs on hardware you can point at. Nothing in sloth-ledger calls the internet; the statement goes from your disk to your GPU and back. That isn't a feature I added on top. Without an open model there is no version of this tool I'd be comfortable telling my neighbour to use.
+With an open-weight model the whole thing runs on hardware you can point at. Nothing in sloth-ledger calls the internet — even the fonts ship in the repo, and a test fails if the page ever references an outside URL. The statement goes from your disk to your GPU and back. That isn't a feature I added on top. Without an open model there is no version of this tool I'd be comfortable telling my neighbour to use.
 
 ## The Lazy Payoff
 
