@@ -23,7 +23,7 @@ and it gives you back:
 - **a short list of the people the model wasn't sure about** — the only ones you have to look at;
 - a draft reply to the notice, where every number and every name comes from the statement.
 
-The lazy part is the point: you don't open 400 transfers. You read a list of {{FLAGGED}} names, fix the ones that are wrong, and copy the letter.
+The lazy part is the point: you don't open 413 incoming transfers. You read a list of 9 names, fix the ones that are wrong, and copy the letter.
 
 ## Demo
 
@@ -62,11 +62,24 @@ Every failure lands on the human, never in the letter.
 The model runs on an RTX 5050 laptop in my flat (8 GB of VRAM), served by Ollama, reached over the home network. Two things I learned the slow way:
 
 - **Gemma 4 is a thinking model.** With thinking left on, my first batch of twelve senders took ten minutes and returned nothing. `"think": false` brought it to under a minute.
-- **12B didn't fit.** `gemma4:12b` needs 8.9 GB with an 8K context, so 3 GB spilled to the CPU and the GPU sat at 22% load. The smaller `{{SMALL_MODEL}}` fits entirely in VRAM.
+- **12B doesn't fit, and that's fine.** `gemma4:12b` needs 8.9 GB with an 8K context, so 3 GB spill to the CPU and the GPU sits at 22% load. A run takes 17 minutes. You start it and make tea; nobody is waiting on a tax letter in real time.
 
-{{BENCH_TABLE}}
+| Model | Time for 205 senders | People from the notes right | Sent to you to check | Wrong and confident |
+|---|---|---|---|---|
+| `gemma4:12b` | 17 min 23 s | 5 / 5 | 9 | 0 |
+| `llama3.1:8b` | 2 min 50 s | 5 / 5 | 69 | 0 |
+| `gemma4:e2b-it-qat` | 1 min 42 s | 5 / 5 | 200 | 0 |
 
-The overall accuracy is flattering — 200 of the 205 senders are customers, so a model that calls everyone a customer gets 97.6%. The numbers I actually care about are the five people named in the notes, and how many senders get sent back to the human.
+The column I care about most is the last one, and it's zero for every model — because of the guard rails, not the models. What the model changes is how much is left for you: the 12B leaves 9 people to look at, the 2B shrugs at almost everyone. Slow and steady wins: the 12B is ten times slower than the 2B and saves you 191 lookups.
+
+It didn't start at zero. The first 12B run made **17 confident mistakes**, and both causes were in my code, not in the prompt:
+
+1. **Same first name.** The notes said flatmate «Динара К.»; the model gave the flatmate label to «Динара Ш.», «Динара Ж.» and «Динара Т.» too — all customers. Now the code finds every «Name I.» in the notes (Russian case endings included: «с Динарой К.» matches «Динара К.») and tells the model `named_in_notes: true/false`.
+2. **A misleading feature.** I passed `same_amount_every_time`, which is trivially true for someone who paid once. The model read one-off customers as regular rent payments. It's now only sent when there are two or more transfers.
+
+That got it to 5. The last five were the model still calling «Ерлан Б.» the brother «Ерлан С.», and customers who happened to pay the same price twice. So one more rule, in code: **"family", "shared" or "loan" for someone the notes don't name is a guess**, and a guess about what is *not* income goes to the human. Zero.
+
+I don't report plain accuracy: 200 of the 205 senders are customers, so a model that calls everyone a customer scores 97.6%. Full numbers and the script are in the repo (`bench.py`, `docs/bench.md`).
 
 ## Why Does Open Innovation Matter?
 
@@ -76,8 +89,13 @@ With an open-weight model the whole thing runs on hardware you can point at. Not
 
 ## The Lazy Payoff
 
-{{PAYOFF}}
+On the sample statement (537 operations, 413 incoming transfers, 205 people):
+
+- **By hand:** open every transfer, group by person, decide who each of 205 people is, add up totals per group, type the letter. At ten seconds a person that's over half an hour of the dullest work there is, before the letter — and the totals are where people make mistakes.
+- **With sloth-ledger:** about a minute to write three sentences, 17 minutes of the laptop doing it on its own, then a short list of 9 people to check. The totals and the letter come out of code.
+
+Honesty note: I haven't had a real person with a real notice use it yet — the statement is synthetic on purpose. The time saved is measured on the sample, not on a user.
 
 ## Prize Categories
 
-Best Use of Gemma — Gemma 4 ({{SMALL_MODEL}} and 12B) runs locally in Ollama as the classifier.
+Best Use of Gemma — Gemma 4 runs locally in Ollama as the classifier (`gemma4:12b` by default; `e2b` measured for comparison).

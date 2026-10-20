@@ -1,0 +1,55 @@
+  gemma4:e2b-it-qat: 12/205
+  gemma4:e2b-it-qat: 24/205
+  gemma4:e2b-it-qat: 36/205
+  gemma4:e2b-it-qat: 48/205
+  gemma4:e2b-it-qat: 60/205
+  gemma4:e2b-it-qat: 72/205
+  gemma4:e2b-it-qat: 84/205
+  gemma4:e2b-it-qat: 96/205
+  gemma4:e2b-it-qat: 108/205
+  gemma4:e2b-it-qat: 120/205
+  gemma4:e2b-it-qat: 132/205
+  gemma4:e2b-it-qat: 144/205
+  gemma4:e2b-it-qat: 156/205
+  gemma4:e2b-it-qat: 168/205
+  gemma4:e2b-it-qat: 180/205
+  gemma4:e2b-it-qat: 192/205
+  gemma4:e2b-it-qat: 204/205
+  gemma4:e2b-it-qat: 205/205
+{
+ "model": "gemma4:e2b-it-qat",
+ "senders": 205,
+ "seconds": 102.1,
+ "accuracy": 0.132,
+ "named_right": 5,
+ "named_total": 5,
+ "sent_to_human": 200,
+ "wrong_and_confident": [],
+ "named": {
+  "Гульнара С.": [
+   "family",
+   "high",
+   "В заметках указано, что мама помогает каждый месяц."
+  ],
+  "Ерлан С.": [
+   "family",
+   "high",
+   "В заметках указано, что брат иногда скидывает деньги."
+  ],
+  "Динара К.": [
+   "shared",
+   "high",
+   "Переводы проводятся регулярно в одинаковые дни, что похоже на оплату части аренды или коммунальных услуг."
+  ],
+  "Асель М.": [
+   "shared",
+   "high",
+   "Переводы проводятся регулярно в одинаковые дни, что похоже на оплату части аренды или коммунальных услуг."
+  ],
+  "Жанна Т.": [
+   "loan",
+   "high",
+   "Указано, что в июле одолжила 300 000 тенге и вернула в сентябре."
+  ]
+ }
+}

@@ -27,7 +27,14 @@ INK = (74, 63, 166)
 
 
 def shot(page, full: bool = False) -> Image.Image:
-    return Image.open(io.BytesIO(page.screenshot(full_page=full))).convert("RGB")
+    for attempt in range(3):          # a busy page can miss the default 30 s
+        try:
+            data = page.screenshot(full_page=full, timeout=120_000)
+            return Image.open(io.BytesIO(data)).convert("RGB")
+        except Exception:
+            if attempt == 2:
+                raise
+            page.wait_for_timeout(2000)
 
 
 def capture(url: str) -> dict:
