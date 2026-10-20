@@ -1,0 +1,7 @@
+[project]
+name = "sloth-ledger"
+version = "0.1.0"
+description = "Sort a card statement for a Kazakh tax notice with a local open model"
+requires-python = ">=3.11"
+license = "MIT"
+optional-dependencies = { pdf = ["pypdf>=4"] }
